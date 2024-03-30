@@ -8,7 +8,7 @@ struct Criterion {
     label: String,
     #[serde(rename = "englishLabel")]
     english_label: String,
-    order: Vec<String>,
+    order: serde_json::Value, // Vec<String>, // TODO!: FIX THIS?
     #[serde(rename = "occurenceType")]
     occurence_type: Option<String>,
     lifetime: Option<String>,
@@ -65,7 +65,7 @@ struct Path {
     id: u32,
     name: String,
     #[serde(rename = "englishLabel")]
-    english_label: String,
+    english_label: Option<String>,
     #[serde(rename = "termKey")]
     term_key: String,
 }
@@ -153,20 +153,12 @@ struct Selection {
 }
 
 #[derive(serde::Deserialize)]
-struct PrePack {
-    id: u32,
-    #[serde(rename = "prePackSelection")]
-    pre_pack_selection: Vec<Selection>,
-    tags: Vec<String>,
-}
-
-#[derive(serde::Deserialize)]
 struct Response {
     #[serde(rename = "betOffers")]
     bet_offers: Vec<BetOffer>,
     events: Vec<Event>,
     #[serde(rename = "prePacks")]
-    pre_packs: Vec<PrePack>,
+    pre_packs: serde_json::Value, // Vec<PrePack>, // NOTE: This is useless?
 }
 
 #[tokio::main]
@@ -174,10 +166,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Fetching URL...");
     let response = reqwest::get(URL).await?;
     println!("Parsing data...");
-    let data = response.json::<Response>().await?;
-    println!(
-        "First bet offer criterion label: {}",
-        data.bet_offers.get(0).unwrap().criterion.label
-    );
+    let data: Response = response.json().await?;
+    println!("Successfully parsed.");
+
+    for offer in data.bet_offers {}
+
     Ok(())
 }
