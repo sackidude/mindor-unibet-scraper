@@ -3,7 +3,7 @@
 #[derive(serde::Deserialize)]
 pub struct Criterion {
     id: u32,
-    label: String,
+    pub label: String,
     #[serde(rename = "englishLabel")]
     pub english_label: String,
     order: serde_json::Value, // Vec<String>, // TODO!: FIX THIS?
@@ -23,7 +23,7 @@ struct BetOfferType {
 #[derive(serde::Deserialize)]
 pub struct Outcome {
     id: u32,
-    label: String,
+    pub label: String,
     #[serde(rename = "englishLabel")]
     pub english_label: String,
     pub odds: Option<u32>,
@@ -48,7 +48,7 @@ pub struct Outcome {
 #[derive(serde::Deserialize)]
 pub struct BetOffer {
     id: u32,
-    closed: String,
+    closed: Option<String>,
     pub criterion: Criterion,
     #[serde(rename = "betOfferType")]
     bet_offer_type: BetOfferType,
