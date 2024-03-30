@@ -161,15 +161,41 @@ struct Response {
     pre_packs: serde_json::Value, // Vec<PrePack>, // NOTE: This is useless?
 }
 
+#[derive(Debug)]
+enum Error {
+    CouldntGetEventIndex0,
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Fetching URL...");
     let response = reqwest::get(URL).await?;
     println!("Parsing data...");
     let data: Response = response.json().await?;
-    println!("Successfully parsed.");
 
-    for offer in data.bet_offers {}
+    let event_filename = format!("{}.csv", &data.events[0].name);
+    let file = std::fs::File::create(&event_filename)?;
+
+    let mut writer = csv::WriterBuilder::new().delimiter(b'\t').from_writer(file);
+
+    println!("Writing data...");
+    writer.write_record(vec!["Offer", "Unibet"])?;
+    writer.flush()?;
+    for offer in data.bet_offers {
+        for outcome in offer.outcomes {
+            if let Some(odds) = outcome.odds {
+                writer.write_record(vec![
+                    format!(
+                        "{}>{}",
+                        offer.criterion.english_label, outcome.english_label
+                    ),
+                    odds.to_string(),
+                ])?;
+            }
+        }
+    }
+    writer.flush()?;
+    println!("Wrote to: {}", &event_filename);
 
     Ok(())
 }
