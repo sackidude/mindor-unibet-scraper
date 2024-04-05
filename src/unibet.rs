@@ -27,7 +27,7 @@ pub struct Outcome {
     #[serde(rename = "englishLabel")]
     pub english_label: String,
     pub odds: Option<u32>,
-    participant: Option<String>,
+    pub participant: Option<String>,
     #[serde(rename = "type")]
     bet_type: String,
     #[serde(rename = "betOfferId")]
