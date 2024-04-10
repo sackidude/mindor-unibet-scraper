@@ -4,6 +4,23 @@ use itertools::Itertools;
 
 mod unibet;
 
+fn odd_num_to_str(num: u32) -> String {
+    let mut num_str = num.to_string();
+    let len = num_str.len();
+
+    // Check if the number is less than 1000
+    if len <= 3 {
+        panic!("Some incorrect odd");
+    }
+
+    // Calculate the index to insert the dot
+    let index = len - 3;
+
+    // Insert the dot at the calculated index
+    num_str.insert(index, '.');
+    num_str
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     print!("Enter the number at end of UNIBET url address: ");
@@ -18,30 +35,39 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let event_filename = format!("{}.csv", &unibet_data.events[0].name);
     let file = std::fs::File::create(&event_filename)?;
 
-    let mut writer = csv::WriterBuilder::new().delimiter(b'\t').from_writer(file);
+    let home_name = unibet_data.events[0].home_name.clone();
+    let away_name = unibet_data.events[0].away_name.clone();
 
     println!("Writing data...");
-    let mut unsorted_data = HashMap::<String, u32>::new();
+    let mut unsorted_data = HashMap::<String, String>::new();
     for offer in unibet_data.bet_offers {
         for outcome in offer.outcomes {
             if let Some(odds) = outcome.odds {
+                let mut printed = false;
+                let odd_str = odd_num_to_str(odds);
                 if let Some(participant) = outcome.participant {
-                    unsorted_data.insert(
-                        format!(
-                            "{} > {} [{}]",
-                            offer.criterion.label, outcome.label, participant
-                        ),
-                        odds,
-                    );
-                } else {
+                    if !(participant == home_name || participant == away_name) {
+                        unsorted_data.insert(
+                            format!(
+                                "{} > {} [{}]",
+                                offer.criterion.label, outcome.label, participant
+                            ),
+                            odd_str.clone(),
+                        );
+                        printed = true;
+                    }
+                }
+                if !printed {
                     unsorted_data.insert(
                         format!("{} > {}", offer.criterion.label, outcome.label),
-                        odds,
+                        odd_str,
                     );
                 }
             }
         }
     }
+    let mut writer = csv::WriterBuilder::new().delimiter(b'\t').from_writer(file);
+
     writer.write_record(vec!["Erbjudande", "Unibet"])?;
     writer.flush()?;
 

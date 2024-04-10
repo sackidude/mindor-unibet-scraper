@@ -90,9 +90,9 @@ pub struct Event {
     #[serde(rename = "englishName")]
     english_name: String,
     #[serde(rename = "homeName")]
-    home_name: String,
+    pub home_name: String,
     #[serde(rename = "awayName")]
-    away_name: String,
+    pub away_name: String,
     start: String,
     group: String,
     #[serde(rename = "groupId")]
