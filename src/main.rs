@@ -63,14 +63,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 ),
                                 odd_str.clone(),
                             );
+                        } else {
+                            unsorted_data.insert(
+                                format!(
+                                    "{} > {} [{}]",
+                                    offer.criterion.label, outcome.label, participant
+                                ),
+                                odd_str.clone(),
+                            );
                         }
-                        unsorted_data.insert(
-                            format!(
-                                "{} > {} [{}]",
-                                offer.criterion.label, outcome.label, participant
-                            ),
-                            odd_str.clone(),
-                        );
                         printed = true;
                     }
                 }
