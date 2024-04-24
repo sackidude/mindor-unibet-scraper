@@ -10,7 +10,9 @@ fn odd_num_to_str(num: u32) -> String {
 
     // Check if the number is less than 1000
     if len <= 3 {
-        panic!("Some incorrect odd");
+        num_str.insert(0, '.');
+        println!("WARN!: {}", num);
+        return num_str;
     }
 
     // Calculate the index to insert the dot
@@ -45,8 +47,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             if let Some(odds) = outcome.odds {
                 let mut printed = false;
                 let odd_str = odd_num_to_str(odds);
+                // TODO!: INFO!: WARN!: REFACTOR
                 if let Some(participant) = outcome.participant {
                     if !(participant == home_name || participant == away_name) {
+                        if outcome.label == "Över" {
+                            unsorted_data.insert(
+                                format!(
+                                    "{} > {} {} [{}]",
+                                    offer.criterion.label,
+                                    outcome.label,
+                                    odd_num_to_str(
+                                        outcome.line.unwrap().try_into().unwrap() // WARN!: What is this!!!
+                                    ),
+                                    participant
+                                ),
+                                odd_str.clone(),
+                            );
+                        }
                         unsorted_data.insert(
                             format!(
                                 "{} > {} [{}]",
